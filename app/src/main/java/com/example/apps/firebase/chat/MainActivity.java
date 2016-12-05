@@ -174,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getChatMessages() {
+        mMessageList.clear();
         mChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -227,6 +228,26 @@ public class MainActivity extends AppCompatActivity {
             return;
         } else
             sendMessage(editText);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mChildEventListener != null) {
+            mDatabaseReference.removeEventListener(mChildEventListener);
+            mChildEventListener = null;
+            mMessageList.clear();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mChildEventListener != null) {
+            mDatabaseReference.removeEventListener(mChildEventListener);
+            mChildEventListener = null;
+            mMessageList.clear();
+        }
     }
 
     @OnClick(R.id.imv_attach)

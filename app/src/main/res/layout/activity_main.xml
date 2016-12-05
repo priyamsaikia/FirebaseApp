@@ -12,6 +12,7 @@
     <include layout="@layout/recyclerview" />
 
     <RelativeLayout
+        android:id="@+id/rl_main_sender_box"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
