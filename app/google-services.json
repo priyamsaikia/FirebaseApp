@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "827176865772",
+    "firebase_url": "https://priyam-4dec16.firebaseio.com",
+    "project_id": "priyam-4dec16",
+    "storage_bucket": "priyam-4dec16.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:827176865772:android:7ced3914203199da",
+        "android_client_info": {
+          "package_name": "com.example.apps.firebase.chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "827176865772-btsf22vvgdf260330jne81kd9kcmki08.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.apps.firebase.chat",
+            "certificate_hash": "696AD76CF7C41F454294461D86E92E34A3EFD714"
+          }
+        },
+        {
+          "client_id": "827176865772-u6erfllfbkq0ntv9ukeslhl09iqnvqfm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABJcS0TxTK9KP9QlS9-0b--xGLJ4Qd3nM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "827176865772-u6erfllfbkq0ntv9ukeslhl09iqnvqfm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

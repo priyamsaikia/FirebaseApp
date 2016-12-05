@@ -9,8 +9,34 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.apps.firebase.chat.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <include layout="@layout/recyclerview" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorAccent"
+        android:orientation="horizontal"
+        android:padding="@dimen/smallBasePadding">
+
+        <ImageView
+            android:id="@+id/imv_attach"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_report_image" />
+
+        <EditText
+            android:id="@+id/edt_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/tv_send"
+            android:layout_toRightOf="@id/imv_attach" />
+
+        <TextView
+            android:id="@id/tv_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="@string/send" />
+    </RelativeLayout>
 </RelativeLayout>
