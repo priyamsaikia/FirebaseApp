@@ -2,4 +2,5 @@
     <string name="app_name">FirebaseChat</string>
     <string name="send">SEND</string>
     <string name="error_empty_msg">Enter Message</string>
+    <string name="error_long_msg">Message Too Long</string>
 </resources>
