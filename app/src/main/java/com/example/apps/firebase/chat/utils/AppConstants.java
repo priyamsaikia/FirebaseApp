@@ -5,4 +5,5 @@ package com.example.apps.firebase.chat.utils;
  */
 public class AppConstants {
     public static final int RC_SIGNIN = 1000;
+    public static final int RC_IMAGE = 1001;
 }

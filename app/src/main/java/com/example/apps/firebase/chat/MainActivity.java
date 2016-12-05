@@ -1,6 +1,7 @@
 package com.example.apps.firebase.chat;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +29,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth mFirebaseAuth;
     FirebaseAuth.AuthStateListener mAuthStateListener;
     FirebaseRemoteConfig mFirebaseRemoteConfig;
+    FirebaseStorage mFirebaseStorage;
+    StorageReference mStorageReference;
 
     long DEFAULT_CHARACTER_COUNT = 140;
 
@@ -104,11 +110,12 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        mFirebaseRemoteConfig=FirebaseRemoteConfig.getInstance();
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         Map<String, Object> defultConfigMap = new HashMap<>();
         defultConfigMap.put(DEAFAULT_MSG_LENGTH, DEFAULT_CHARACTER_COUNT);
         fetchConfig();
-
+        mFirebaseStorage = FirebaseStorage.getInstance();
+        mStorageReference = mFirebaseStorage.getReference().child("photo_msgs");
     }
 
     private void fetchConfig() {
@@ -134,9 +141,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == AppConstants.RC_SIGNIN) {
-            if (requestCode == RESULT_CANCELED)
+        if (requestCode == AppConstants.RC_SIGNIN) {
+            if (resultCode == RESULT_CANCELED)
                 finish();
+        } else if (requestCode == AppConstants.RC_IMAGE) {
+            if (resultCode == RESULT_OK) {
+                Uri uri = data.getData();
+                StorageReference storageReference = mStorageReference.child(uri.getLastPathSegment());//getting specific image
+                storageReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Uri photoUrl = taskSnapshot.getDownloadUrl();
+                        ChatMessageBean bean = new ChatMessageBean(null, mUsername, photoUrl.toString());
+
+                        mDatabaseReference.push().setValue(bean);
+                    }
+                });
+            }
         }
     }
 
@@ -201,11 +222,19 @@ public class MainActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(editText.getText()))
             return;
         else if (editText.getText().length() > DEFAULT_CHARACTER_COUNT) {
-            Log.d(TAG,"length = "+editText.getText().toString().length()+" allowed length = "+DEFAULT_CHARACTER_COUNT);
+            Log.d(TAG, "length = " + editText.getText().toString().length() + " allowed length = " + DEFAULT_CHARACTER_COUNT);
             Toast.makeText(this, getText(R.string.error_long_msg), Toast.LENGTH_SHORT).show();
             return;
         } else
             sendMessage(editText);
+    }
+
+    @OnClick(R.id.imv_attach)
+    public void attachImageClick(View view) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/jpeg");
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+        startActivityForResult(Intent.createChooser(intent, "Choose image"), AppConstants.RC_IMAGE);
     }
 
     private void sendMessage(EditText editText) {
