@@ -1,5 +1,7 @@
 package com.example.apps.firebase.chat;
 
+import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,6 +15,10 @@ import android.widget.Toast;
 
 import com.example.apps.firebase.chat.adapter.MessageAdapter;
 import com.example.apps.firebase.chat.beans.ChatMessageBean;
+import com.example.apps.firebase.chat.utils.AppConstants;
+import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -45,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
     private MessageAdapter mMessageAdapter;
     ChildEventListener mChildEventListener;
 
+    FirebaseAuth mFirebaseAuth;
+    FirebaseAuth.AuthStateListener mAuthStateListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +68,54 @@ public class MainActivity extends AppCompatActivity {
         recycerview.setAdapter(mMessageAdapter);
         recycerview.setLayoutManager(new LinearLayoutManager(this));
 
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    //signed in
+                    mUsername = user.getDisplayName();
+                    getChatMessages();
+                } else {
+                    mMessageList.clear();
+                    mMessageAdapter.notifyDataSetChanged();
+                    if (mChildEventListener != null) {
+                        mDatabaseReference.removeEventListener(mChildEventListener);
+                        mChildEventListener = null;
+                    }
+
+                    startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder()
+                            .setProviders(AuthUI.GOOGLE_PROVIDER).build(),
+                            AppConstants.RC_SIGNIN);
+                }
+            }
+        };
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==AppConstants.RC_SIGNIN){
+            if(requestCode==RESULT_CANCELED)
+                finish();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    private void getChatMessages() {
         mChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
